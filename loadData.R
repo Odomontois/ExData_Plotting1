@@ -15,8 +15,7 @@ dateSubset = function (fileName, searchDates, buffsize = 1000){
   pasteArgs$sep <- "|"
   regexVariants <- do.call(paste, pasteArgs)
   regex <- paste("^(", regexVariants, ").*", sep = "")
-  message(paste("using regex", regex))
-  
+
   open(con)
   
   repeat{
@@ -34,7 +33,7 @@ dateSubset = function (fileName, searchDates, buffsize = 1000){
 
 #' split number range to list of ranges of consecutive numbers
 #'
-#' @param number vector 
+#' @param data number vector 
 #'
 #' @return list of two-element number vectors, 
 #' first element of each vector is the starting number of range
@@ -60,12 +59,27 @@ splitToRanges <- function(data = integer()){
   result
 }
 
+#' Loading dataset, choosing rows containing only needed dates
+#'
+#' @param dates character vector in datafile format i.e. 4/12/1995, used when `ranges = "detect"`
+#' @param url url for downloading dataset zip
+#' @param zipfile name for zip file
+#' @param datadir directory to store 
+#' @param datafile zipped filename
+#' @param ranges could be: 
+#' * list, then it's used as list of begin-end intervals of indexes
+#' * numeric, then it's used as two-element interval of indexes
+#' * "all", then whole file will be used
+#' * "detect", then list of integers will be calculated from `dates` parameter
+#'
+#' @return loaded dataset
 loadData <- function(
     dates    = c('2/2/2007',  '1/2/2007'),
     url      =  "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip",
     zipfile  = "power_consumption.zip",
     datadir  = "data",
-    datafile = "household_power_consumption.txt"
+    datafile = "household_power_consumption.txt",
+    ranges   = "detect"
   ){
   if(!file.exists(zipfile)){
     # special treat for windows systems, that could not have curl, but could download https by default
@@ -80,10 +94,16 @@ loadData <- function(
   
   datapath <- file.path(datadir, datafile)
   
-  ranges <- splitToRanges(dateSubset(datapath, dates))
-  col.names <- colnames(read.csv(datapath, nrows = 1, sep=";"))
-  message(do.call(paste,c("using colnames", as.list(col.names))))
+  ranges <- switch(class(ranges),
+                   list = ranges,
+                   numeric = list(ranges),
+                   character = switch(ranges,
+                                      all = list(c(2, -1)),
+                                      detect = splitToRanges(dateSubset(datapath, dates))
+                                      ))
   
+  col.names <- colnames(read.csv(datapath, nrows = 1, sep=";"))
+
   setClass("ShortDate")
   setAs("character", "ShortDate", function(from) as.Date(from, format="%d/%m/%Y"))
   
@@ -93,7 +113,8 @@ loadData <- function(
     begin <- range[1]
     size <- range[2]
     dataset<- read.csv(datapath, 
-                       header = FALSE, 
+                       header = FALSE,
+                       na.strings = "?",
                        col.names = col.names, 
                        skip = begin - 1,
                        nrows = size,
@@ -102,6 +123,36 @@ loadData <- function(
   })
 
   joined <- do.call(rbind, datas)
-  joined$TimeStamp <- with(joined, as.POSIXlt(paste(as.character(Date), Time)))
+  
+  dateStrings <- format(joined$Date, "%Y-%m-%d")
+  joined$TimeStamp <- strptime(paste(dateStrings, joined$Time), "%Y-%m-%d %H:%M:%S")
   joined
+}
+
+
+#' Small framework for building plots
+#'
+#' @param data dataframe or arguments to `loadData` function 
+#' @param draw function to draw plot for data
+#' @param fileName output PNG file name or NULL to plot on the default device (screen)
+#'
+#' @return
+#' @export
+#'
+#' @examples
+pngPlotWithData <- function(data, fileName, draw){
+  data <- switch(class(data),
+         list = do.call(loadData, data),
+         data.frame  = data
+  )
+
+  if(!is.null(fileName)){
+    png(fileName)
+  }
+  
+  draw(data)
+  
+  if(!is.null(fileName)){
+    invisible(dev.off())
+  }
 }
