@@ -42,7 +42,8 @@ Code consists of loading/reading/plotting utilities collected in the file `loadD
 
 For building each plot you could easily load it with 
 ```R 
-source(plotN.R) 
+source(plotN.R)
+plotN()
 ```
 And it's should (re)build correct `plotN.png` file.
 
