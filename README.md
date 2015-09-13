@@ -33,11 +33,55 @@ web site</a>:
 <li><b>Sub_metering_3</b>: energy sub-metering No. 3 (in watt-hour of active energy). It corresponds to an electric water-heater and an air-conditioner.</li>
 </ol>
 
+## Notes by student
+_`plotN` stands for any of `plot1, plot2, plot3, plot4`_
+
+### Usage
+
+
+Code consists of loading/reading/plotting utilities collected in the file `loadData.R`
+
+For building each plot you could easily load it with 
+```R 
+source(plotN.R) 
+```
+And it's should (re)build correct `plotN.png` file.
+
+For advanced usage you could pass custom `fileName` parameter to each `plotN` function or even call 
+```R
+plotN(fileName = NULL)
+```
+So the plot will be send to current device.
+
+You could also pass additional parameters for `plot`, `points`, `hist` functions through `plotN` functions
+
+For example you can
+
+```R
+plotN(lty = 5)
+plotN(lwd = 2)
+``` 
+and similar
+
+###Loading
+
+For any plot you could pass your own data or customize which dataset ranges will be used.
+`loadData` function has few arguments, most notable are `ranges` and `dates`. You could pass them to any data plot as list passed to `data` argument.
+`loadData` using special regular expression based date detecting algorithm when `"detect"` is passed to `ranges` algorighm.
+
+So you can
+```R
+plotN(data = myOwnDataFrame)
+plotN(data = list(ranges = c(1000, 2000))) # for using another lines range
+plotN(data = list(ranges = list((c(1000,2000), c(3000, 4000))))) # for multiple ranges
+plotN(data = list(ranges = "all")) # for whole dataset (very long waiting)
+plotN(data = list(dates = "1/12/2006")) #for custom dates
+plotN(data = list(dates = "..?/12/2008")) #for whole month
+plotN(data = list(dates = c("1/12/2008", "2/12/2008", "3/12/2008")) #for some specific days
+plotN(data = list(dates = "(1|2|3)/12/2008") #same as above
+```
+
 ## Loading the data
-
-
-
-
 
 When loading the dataset into R, please consider the following:
 
