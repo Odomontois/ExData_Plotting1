@@ -40,7 +40,7 @@ _`plotN` stands for any of `plot1, plot2, plot3, plot4`_
 
 Code consists of loading/reading/plotting utilities collected in the file `loadData.R`
 
-For building each plot you could easily load it with 
+for each plot you could easily
 ```R 
 source(plotN.R)
 plotN()
@@ -80,6 +80,9 @@ plotN(data = list(dates = "..?/12/2008")) #for whole month
 plotN(data = list(dates = c("1/12/2008", "2/12/2008", "3/12/2008")) #for some specific days
 plotN(data = list(dates = "(1|2|3)/12/2008") #same as above
 ```
+
+### Reusing
+`plot4` is using `plot2` and `plot3` functions, so you can easily embed customized calls of plots inside your own plots.
 
 ## Loading the data
 
