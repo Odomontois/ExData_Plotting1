@@ -38,7 +38,6 @@ _`plotN` stands for any of `plot1, plot2, plot3, plot4`_
 
 ### Usage
 
-
 Code consists of loading/reading/plotting utilities collected in the file `loadData.R`
 
 For building each plot you could easily load it with 
@@ -75,7 +74,7 @@ plotN(data = myOwnDataFrame)
 plotN(data = list(ranges = c(1000, 2000))) # for using another lines range
 plotN(data = list(ranges = list((c(1000,2000), c(3000, 4000))))) # for multiple ranges
 plotN(data = list(ranges = "all")) # for whole dataset (very long waiting)
-plotN(data = list(dates = "1/12/2006")) #for custom dates
+plotN(data = list(dates = "1/12/2008")) #for custom dates
 plotN(data = list(dates = "..?/12/2008")) #for whole month
 plotN(data = list(dates = c("1/12/2008", "2/12/2008", "3/12/2008")) #for some specific days
 plotN(data = list(dates = "(1|2|3)/12/2008") #same as above
